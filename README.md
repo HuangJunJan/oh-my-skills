@@ -17,14 +17,11 @@ OhMySkills 的方案：**通用规则集中在一个公开 GitHub 仓库**，用
 ## 快速上手 | Quick Start
 
 ```bash
-# 1. 装到当前项目，自动适配所有已用的 AI 工具
+# 装到当前项目，自动适配所有已用的 AI 工具
 npx skills add HuangJunJan/oh-my-skills --all
-
-# 2. 在 AI 会话里跑一次初始化（把 _core 元规则复制到本项目）
-/oms-onboard
 ```
 
-完事。下一次 AI 会话开始时，让它先读 `./.oms/reference/_core.md` 即可。
+完事。**装完即用，无需任何手动初始化**——AI 会按 skill description 关键词自动加载 3 个 skill，`oms-meta` 的 5 条元规则在每次新会话开始时优先生效。
 
 ---
 
@@ -32,11 +29,11 @@ npx skills add HuangJunJan/oh-my-skills --all
 
 | Skill | 主题 | 何时生效 |
 |---|---|---|
+| `oms-meta` | 最高优先级元规则（优先级层级 / Windows-UTF-8 / 单一事实源 / 禁兼容旧逻辑 / 默认局部验证） | 任何对话开始时；任何代码改动 / oms-* skill 触发之前 |
 | `oms-qa` | 通用问答交互（回复风格 + 严审/盘问模式） | 每轮对话默认；触发词进入盘问模式 |
 | `oms-coding` | 通用编程规范（编码前/中、变更安全、敏感操作、验证、交付） | 任何代码改动 / 验证 / 交付任务 |
-| `oms-onboard` | 项目初始化：把 `_core` 元规则复制到 `./.oms/reference/_core.md` | 用户首次在项目里跑 `/oms-onboard`（一次性） |
 
-`_core` 含 5 条最高优先级元规则：优先级层级 / Windows-UTF-8 基线 / 单一事实源 / 禁兼容旧逻辑 / 默认局部验证。
+3 个 skill 都靠 description 关键词由 AI 自动触发，不需要 slash command、不需要手动初始化、不在用户项目里创建任何额外目录。
 
 ---
 
@@ -57,13 +54,13 @@ npx skills add HuangJunJan/oh-my-skills -a claude-code -a codex
 
 # 指定 skill（可多个）
 npx skills add HuangJunJan/oh-my-skills -s oms-coding
-npx skills add HuangJunJan/oh-my-skills -s oms-qa -s oms-coding
+npx skills add HuangJunJan/oh-my-skills -s oms-meta -s oms-coding
 
 # 全局安装（默认是项目级；加 -g 装到用户主目录）
 npx skills add HuangJunJan/oh-my-skills -g
 
 # 版本钉（推荐团队协作时使用）
-npx skills add HuangJunJan/oh-my-skills@v0.1
+npx skills add HuangJunJan/oh-my-skills@v0.1.1
 npx skills add HuangJunJan/oh-my-skills@<commit-sha>
 
 # 远端列出仓库里有哪些 skill（不安装）
@@ -82,38 +79,25 @@ npx skills add HuangJunJan/oh-my-skills --list
 
 ## 用 | Use
 
-### 第一步：跑 `/oms-onboard`（每个项目一次性）
-
-装完之后，在 AI 会话里手动触发：
-
-```
-/oms-onboard
-```
-
-AI 会把本仓库自带的 `reference/_core.md` 复制到当前项目的 `./.oms/reference/_core.md`。这个文件就是后续每次新会话开始时 AI 要先读的最高优先级元规则。
-
-> `/oms-onboard` 是一次性的；同一项目第二次跑会检测内容是否一致，避免无意义覆写。
-
-### 第二步：让 AI 按 description 自动触发
-
-`oms-qa` 与 `oms-coding` 不需要手动调用，AI 会按 description 关键词匹配自动加载。典型场景示例：
+**装完即用，无需任何手动初始化步骤**。`oms-meta` / `oms-qa` / `oms-coding` 都靠 AI 工具按 description 关键词自动触发匹配。典型场景示例：
 
 | 用户说 | 触发的 skill | 触发段 |
 |---|---|---|
+| 任何对话开始 / 任何代码任务之前 | `oms-meta` | 5 条元规则全局生效 |
 | 「按 brainstorm 严审我的方案」/「grill me」 | `oms-qa` | B 段 盘问模式 |
 | 「改一下这个组件」/「加个新接口」 | `oms-coding` | A/B/C 段 编码规范 + 变更安全 |
 | 「改一下 .env 文件」 | `oms-coding` | D 段 敏感操作（默认只读） |
-| 「跑一下全量 type-check」 | `oms-coding` | E 段 验证策略（劝阻 + 让用户明确确认） |
+| 「跑一下全量 type-check」 | `oms-coding` + `oms-meta` 第 5 条 | E 段 验证策略（劝阻 + 让用户明确确认） |
 
-### 关于优先级
+### 优先级
 
 冲突时取更高：
 
 ```
 用户当次对话明确要求
   > 项目级 AGENTS.md（更近层级）
-    > ./.oms/reference/_core.md（本仓库的 _core 元规则）
-      > skills 默认行为
+    > oms-meta（本仓库 5 条元规则）
+      > 其它 oms-* skills 默认行为
         > 工具内置默认
 ```
 
@@ -131,19 +115,21 @@ npx skills update oms-coding
 
 更新只是把仓库最新内容拉下来重新替换 canonical 目录的文件，已建立的 junction / symlink 不需要重建。
 
+> **从 v0.1 升级到 v0.1.1 的用户**：v0.1.1 起 `oms-onboard` 已弃用，被 `oms-meta` 取代。先一次性 `npx skills remove oms-onboard` 清掉旧 skill，再正常 `npx skills update` 即可拿到 `oms-meta`。
+
 ---
 
 ## 卸载 | Uninstall
 
 ```bash
 # 显式列出要卸载的 skill
-npx skills remove oms-qa oms-coding oms-onboard
+npx skills remove oms-meta oms-qa oms-coding
 
 # 交互式选择
 npx skills remove
 ```
 
-卸载只清理 `.agents/skills/oms-*` 与各 agent 目录下的引用；`./.oms/reference/_core.md`（onboard 复制过去的）不会被自动删除——如确认不再用，手动 `rm -rf .oms/` 即可。
+卸载只清理 `.agents/skills/oms-*` 与各 agent 目录下的引用。v0.1.1 起本仓库不再在用户项目里创建任何额外目录，无残留需手动清理。
 
 ---
 
@@ -178,20 +164,20 @@ npx skills remove
 - 仓库 Settings → General → Danger Zone 改为 Public。
 - 或先用 `--list` 验证：`npx skills add HuangJunJan/oh-my-skills --list`。
 
-### Q. `/oms-onboard` 跑完没出现 `./.oms/reference/_core.md`？
-原因：AI 工具没识别 onboard skill，或权限不足。
-手动救：
-1. 找到本地已装的 onboard skill 文件：项目级在 `./.agents/skills/oms-onboard/reference/_core.md`，全局在 `~/.agents/skills/oms-onboard/reference/_core.md`（Claude Code 全局是 `~/.claude/skills/oms-onboard/reference/_core.md`）。
-2. 手动 `mkdir -p ./.oms/reference && cp <上面找到的路径> ./.oms/reference/_core.md`。
-3. 后续新会话开始时让 AI 先读 `./.oms/reference/_core.md` 即可。
+### Q. 装完之后 AI 没自动按 `oms-meta` / `oms-qa` / `oms-coding` 触发？
+原因可能：(a) AI 工具版本太旧未支持 SKILL.md progressive disclosure；(b) skill 未正确安装到该工具识别的目录。
+排查：
+- 用 `npx skills list` 确认 3 个 skill 在已装列表里。
+- 检查工具对应目录是否存在 `oms-*/SKILL.md` 文件（路径见上方「支持的 Agent」表）。
+- 在当前会话里显式 prompt 一次「请先加载并应用 `oms-meta` 5 条元规则」，若有效说明是触发关键词匹配问题——给作者提 issue 我们补 description 关键词。
 
 ### Q. 已经装了同名的 skill（比如别的 `oms-coding`）会冲突吗？
 `vercel-labs/skills` 默认 silent overwrite。`oms-` 前缀本身就是为了降低冲突概率；如确实有同名包先 `npx skills remove <名字>` 再装本仓库。
 
 ### Q. 团队协作怎么钉版本？
-推荐用 `@v0.1` 或 `@<commit-sha>` 形式装：
+推荐用 `@v0.1.1` 或 `@<commit-sha>` 形式装：
 ```bash
-npx skills add HuangJunJan/oh-my-skills@v0.1
+npx skills add HuangJunJan/oh-my-skills@v0.1.1
 ```
 安装后会生成 `./skills-lock.json`，把它提交进 git 即可让全员锁定同一版。
 
@@ -199,7 +185,7 @@ npx skills add HuangJunJan/oh-my-skills@v0.1
 
 ## Roadmap
 
-MVP 阶段（v0.1）只交付 3 个 skill：`oms-qa` / `oms-coding` / `oms-onboard`。后续候选（**不在当前范围**）：
+MVP 阶段（v0.1.1）只交付 3 个 skill：`oms-meta` / `oms-qa` / `oms-coding`。后续候选（**不在当前范围**）：
 
 - `oms-tools` — MCP 严格使用 / Context7 文档查询 / agent-browser 无痕
 - `oms-git` — 提交规范 / 分支命名 / PR 流程 / commit message 风格
