@@ -1,0 +1,21 @@
+# 安装备份（vercel-labs/skills 冲突保护时可能生成）
+*.bak
+
+# oms-onboard 在项目里创建的本地元规则副本（不应进 OhMySkills 仓库本身）
+.oms/
+
+# Trellis 工作流（任务、journal、spec 等本地方法论文件，不公开）
+.trellis/
+.claude/
+
+# 历史参考样本（含本地账号密码，不公开）
+now.md
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+
+# 操作系统
+.DS_Store
+Thumbs.db

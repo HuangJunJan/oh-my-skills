@@ -1,0 +1,179 @@
+# <项目名> AGENTS 规则
+
+> 作用域：仓库根目录及全部子目录。AI 助手每次新会话开始须先完整阅读本文件再执行任务。
+> 本文件仅记录**本项目特有**的工程约定、组件使用规范、目录结构、数据流约束。
+
+---
+
+## §1 本地调试信息 | Local Debug Info
+
+- 调试地址：`http://localhost:5555/creditLeval`
+- 账号：`admin` / 密码：`yf2023`
+- 仅用于本地开发与浏览器排查，**不要**写入业务代码、日志、提交说明、文档。
+
+---
+
+## §2 风格与样式基线 | Style Baseline
+
+- 风格以现有 `vxe-table` / `vxe-pc-ui` 体系为准。
+- 业务自定义样式基础规则（仅自定义，组件库默认值不覆盖）：
+  - 单页最大标题 `24px`
+  - 区块标题 `16px` / 颜色 `#666`
+  - 正文 `14px`
+  - 页面业务容器 `padding: 12px 16px`
+  - 大区块间距 `16px`；区块内小块间距 `10px`
+
+---
+
+## §3 组件、布局与表格 | Components, Layout & Table
+
+### 组件选择
+- 数值输入用 `vxe-number-input`；**禁用** `vxe-input type="number"`。
+- `vxe` 组件优先**配置式**实现（`options/events/slots` 收口），减少模板散落逻辑。
+- 空状态优先 `vxe-empty`；需无图标时在其上兼容调整。
+
+### 表格（vxe-grid）
+- 表格默认用 `vxe-grid`，分页用内置分页。
+- **不在页面重复覆盖**：`border` / `round` / `stripe` / `showOverflow` / `rowConfig` / `columnConfig` / `headerAlign` 等基础属性，统一沿用 `main.js` 全局配置。
+- `columns` 默认不写 `align` / `headerAlign`，统一沿用全局；仅明确需求时局部指定。
+- **操作列固定左侧**（最高优先级，弹窗内表格同样适用，不得右置）。
+- 控制可视区高度统一用 `gridOptions.height/maxHeight`，不在外层叠加临时滚动方案。
+
+### 分页默认值
+- `currentPage: 1` / `pageSize: 20` / `pageSizes: [20, 50, 100, 200, 500]`
+- `pagerConfig` 不配置 `layouts`，使用组件默认布局；除非页面有明确设计要求。
+
+### 标准 vxe-grid 模板（reference pattern）
+```vue
+<template>
+  <vxe-grid v-bind="gridOptions" v-on="gridEvents">
+    <template #toolbar_buttons>
+      <vxe-button status="primary" content="新增" @click="handleAdd" />
+    </template>
+  </vxe-grid>
+</template>
+
+<script setup lang="ts">
+import { reactive } from 'vue'
+
+const pagerVO = reactive({
+  currentPage: 1,
+  pageSize: 20,
+  total: 0,
+  pageSizes: [20, 50, 100, 200, 500],
+})
+
+const gridOptions = reactive({
+  loading: false,
+  data: [],
+  columns: [],
+  toolbarConfig: { slots: { buttons: 'toolbar_buttons' } },
+  pagerConfig: pagerVO,
+})
+
+const gridEvents = {
+  pageChange({ currentPage, pageSize }) {
+    pagerVO.currentPage = currentPage
+    pagerVO.pageSize = pageSize
+    queryList()
+  },
+}
+
+async function queryList() {
+  // const res = await getList({ currentPage: pagerVO.currentPage, pageSize: pagerVO.pageSize })
+  // gridOptions.data = res.records
+  // pagerVO.total = res.total
+}
+
+function handleAdd() {}
+</script>
+```
+
+### 标准首页布局
+- "搜索表单 + 工具栏 + 分页表格"类首页统一两段式：`base-page + __search + __table`
+  - 搜索区：`padding: 5px 12px` + `border-bottom: 1px solid #E6E8EB`，不插入独立分割线节点
+  - 表格区：`padding: 12px 16px` + `display: flex` + `flex: 1` + `min-height: 0` + `overflow: hidden`
+  - 新增按钮放在 `vxe-grid` 的 toolbar slots
+- 前端 mock / 本地筛选分页链路：`formFilters + appliedFilters + filteredRows + pagedRows + pagerVO`
+
+### Ghost / Plain 按钮
+- 优先复用 `src/styles/base.less` 全局 `*-button__plain` 样式（如 `error-button__plain`、`primary-button__plain`）。
+- 缺少状态时统一补到全局样式，**不在页面/组件内重复覆盖**。
+
+### 状态拆分
+- 页面状态按业务模块拆分（如 `detailInfo` / `tableData` / `opinions` / `actionForm`），**禁止用一个对象包揽整页**，避免并发回填 / 局部刷新 / 弹窗联动时的交叉污染。
+
+### 联动方式
+- 组件间联动优先用组件事件（`emit` / `@change` / 自定义事件）驱动数据刷新；能用事件触发就不用 `watch`。
+- `watch` 仅用于"无法挂接组件事件"的被动联动（路由参数 / 外部 store / 异步回填依赖），并在注释说明触发来源与必要性。
+- 同一刷新链路**禁止**"事件 + watch"双触发并存。`watch` 优先最小监听源，避免不必要的 `deep/immediate`。
+
+---
+
+## §4 数值与格式化 | Number & Format
+
+### 精度
+- 数量：四舍五入 4 位小数，不足补 0
+- 金额：四舍五入 2 位小数，不足补 0
+- 百分比：四舍五入 2 位小数，不足补 0；`< 0.01%` 显示 `<0.01%`
+
+### vxe-table 对齐（**仅 vxe-table**，vxe-grid 不额外配置对齐）
+- 居中：序号、百分数、时间、单位、工程量
+- 右对齐：金额
+- 左对齐：其他字段
+- 表头居中
+
+### 格式化实现
+- 格式化代码统一复用 `src/utils/common.js`，**不在页面或列配置散落手写** `toFixed` / 百分号拼接 / 阈值判断。
+
+```ts
+import { amountPrice, formatPercentage, formatQuantity } from '@/utils/common.js'
+
+const columns = [
+  { field: 'amount',   title: '金额',   align: 'right',  formatter: ({ cellValue }) => amountPrice(cellValue) },
+  { field: 'quantity', title: '工程量', align: 'center', formatter: ({ cellValue }) => formatQuantity(cellValue) },
+  { field: 'rate',     title: '占比',   align: 'center', formatter: ({ cellValue }) => formatPercentage(cellValue) },
+]
+```
+
+- 各格式化方法返回值直接展示，**不再额外补 `|| '--'`** 一类兜底。
+- 百分号是否拼接按需决定；明确要求带单位时在外层拼 `%`，避免 `--%`。
+
+---
+
+## §5 公用组件复用 | Shared Components
+
+- **搜索场景**（基础查询 + 展开筛选）：优先复用 `src/components/AdvancedSearch/index.vue`；用前先读 `AdvancedSearch.md`，遵循既有字段模型和交互。
+- **确认弹窗**（删除 / 二次确认 / 导出 / 未选择提示）：优先复用 `src/utils/confirm.ts` 的 `globalModal`；用前读 `confirm.md`。`globalModal` 不足时先增强 `confirm.ts`，再回业务页复用，**禁止页面散落手写** `VxeUI.modal.confirm`。
+- **错误提示**：接口失败全局统一处理，**不主动提示**，除非用户明确要求提示错误信息。
+- **字典**：选项统一复用 `src/stores/dict.ts` 的 `useDictStore` / `setDictMap` / `dictMap`；**禁止硬编码字典选项**，**禁止直接拼字典请求 URL**。依赖字典值的默认值 / 回显 / 联动 / 保存参数必须等字典接口返回后再赋值。
+
+---
+
+## §6 加解密与 API | Crypto & API
+
+### 加密
+- 敏感数据 AES 加密传输，逻辑在 `src/utils/crypto.ts`。
+- 加密密钥通过 `src/utils/encryptConfig.ts` 从后端动态获取，`main.js` 初始化。
+- 请求加密白名单由 `isInWhitelist` 判断；敏感接口需从白名单中排除。
+
+### API 分层
+- 所有请求统一放 `src/api`；**禁止在** `src/views` / `src/components` / `src/stores` **直接写裸 axios**。
+- 请求实例 / 拦截器 / 通用方法走 `src/api/index.ts`，辅助逻辑放 `src/api/helper/index.ts`。
+- 接口错误码由 `axios` 拦截器统一处理；业务页不重复做 `res.code` 分支。代码只保留成功路径，失败用 `try/catch` 收口。
+- 业务接口按领域拆到 `src/api/<业务域>/*.ts`；新增接口优先放现有业务域目录。
+- 页面只从对应 `api` 模块导入请求方法，**不在页面拼 URL 或手写重复请求**。
+
+### 数据流约束
+- 接口出参默认直接使用源数据结构（source data as-is）；不额外做去重 / 判空兜底 / 重组映射 / 二次加工。
+- 联调完成后必须清理同目录历史 `mock` 数据与未引用的旧组件 / 函数，避免双轨逻辑。
+- "列表页 + 新增/编辑弹窗"场景：新增/编辑接口调用与参数组装**收口在弹窗内部**，父页面只负责开关、上下文透传、成功后刷新。
+- 同模块 TS 类型统一收敛在模块根 `type.ts`（如 `mainly/type.ts`），页面与子组件 `import type` 复用，**避免同结构类型在多处重复定义**。
+
+---
+
+## §7 联调任务的改动边界 | Integration Task Scope
+
+- "接口对接 / 数据接线 / 联调 / 字段替换 / bug 修复"类任务，默认**只改**数据来源、参数、字段映射、必要展示绑定。
+- 未获明确要求，**不改**：布局、筛选项、按钮、弹窗、标签页、表格结构、交互流程、文案口径。
+- ID 类字段无论后端接口定义为何类型，前端统一按 `string` 处理。
