@@ -1,11 +1,11 @@
 ---
 name: oms-meta
-description: OhMySkills 最高优先级元规则集——优先级层级、Windows-UTF-8 基线、单一事实源、禁兼容旧逻辑、默认局部验证。触发：任何对话开始时优先加载；任何代码改动、新增、删除任务之前；任何 oms-* skill 触发之前。
+description: OhMySkills 最高优先级元规则集——优先级层级、元规则不可视为建议、skill 间冲突仲裁、不确定不假设、工具能力前置确认、skill 间引用而非复制、平台基线表格(win/mac/linux)。触发：任何对话开始时优先加载；任何代码改动之前；任何 oms-* skill 触发之前。
 ---
 
 # OhMySkills 元规则 | Meta Rules
 
-本 skill 是 OhMySkills 的**最高优先级元规则集**，应优先于其它 `oms-*` skill 加载。任何 `oms-qa` / `oms-coding` / 未来新增 `oms-*` skill 与本 skill 冲突时，**以本 skill 为准**。
+本 skill 是 OhMySkills 的**最高优先级元规则集**，应优先于其它 `oms-*` skill 加载。任何 `oms-qa` / `oms-coding` / `oms-fe-coding` / 未来新增 `oms-*` skill 与本 skill 冲突时，**以本 skill 为准**。
 
 **优先级层级**（priority chain，从高到低）：
 
@@ -19,21 +19,50 @@ description: OhMySkills 最高优先级元规则集——优先级层级、Windo
 
 冲突时取更高层级。
 
-## 5 条元规则 | The Five Core Rules
+## 6 条元规则 | The Six Core Rules
 
 1. **优先级层级**：用户当次对话明确要求 > 项目级 `AGENTS.md`（更近层级）> 本 `oms-meta` 元规则 > 其它 `oms-*` skills 默认行为 > 工具内置默认。冲突时取更高。
 
-2. **平台基线**：Windows / PowerShell 读写文本必须显式使用 UTF-8 无 BOM。跨平台路径处理优先用语言内置 path API。
+2. **不确定不假设**（no assumption without verification）：未读的代码、未查的接口、未见的库行为，必须显式标注「未确认」，并指出下一步如何确认（读哪个文件、查哪个文档、跑哪条命令）。禁基于印象、过时记忆、训练数据假设事实。
 
-3. **单一事实源**：真实接口字段 / 代码 / 配置是唯一事实来源。不依赖印象、过时文档、缓存记忆。ID 类字段无论后端定义为何类型，前端统一 `string` 处理。
+3. **工具能力前置确认 / 不擅自降级**（tool capability gating）：用户明确要求某 MCP / 工具（如 Context7、agent-browser）时，若当前会话未暴露该工具，**直接停止并说明**；不擅自降级、不手工模拟、不假定可用。浏览器操作默认无痕（incognito only），当前工具不支持无痕就停止。
 
-4. **禁止兼容旧逻辑**：除非用户明确要求，不兼容旧字段、历史分支、双轨口径，不额外做去重 / 判空兜底 / 重组映射等修正逻辑。
+4. **skill 间引用而非复制**（reference over duplication）：跨 skill 引用另一 skill 的规则时，写「见 `$oms-X` 第 N 节」而非复制规则正文。避免双源漂移、维护成本翻倍。
 
-5. **默认局部验证**：默认只做改动涉及的文件夹 / 单文件验证，不做全量校验；仅当用户明确要求才执行全局校验（type-check / build / 全量 lint / 全量 test）。
+5. **默认局部验证**（minimal validation by default）：默认只做改动涉及的文件夹 / 单文件验证，不做全量校验；仅当用户明确要求才执行全局校验（type-check / build / 全量 lint / 全量 test）。具体验证细则见 `$oms-coding` E 节。
+
+6. **平台基线**（platform baseline）：见下方独立小节「平台基线表格」。AI 进入任何项目第一时间识别 OS，按对应列约束所有后续动作。
+
+## 平台基线 | Platform Baseline
+
+OhMySkills 面向多平台开发者分发。AI 在以下三大平台执行任何动作时必须遵守对应列约束：
+
+| 维度 | Windows（PowerShell / Git Bash） | macOS（zsh / bash） | Linux（bash） |
+|------|----------------------------------|----------------------|----------------|
+| 文本 IO 编码 | **必须显式 UTF-8 无 BOM**（默认 ANSI/GBK 会乱码） | UTF-8 | UTF-8 |
+| 路径分隔符 | 用语言内置 `path` API；禁手拼 `\` 或 `/` | `/` | `/` |
+| Shell 类型 | PowerShell ≠ bash，命令不可互译；项目脚本默认 Git Bash | bash / zsh | bash |
+| 行尾符 | 遵循 `.gitattributes`，禁主动引入 CRLF | LF | LF |
+| 文件名大小写 | 不敏感（NTFS） | 不敏感（APFS 默认） | **敏感**（ext4），同名异 case 视为两文件 |
+| 可执行权限 | 无 `chmod`，脚本靠扩展名 / shebang | `chmod +x` 必加 | `chmod +x` 必加 |
+| 删除命令 | `Remove-Item` / `del`，**不是 `rm`** | `rm` | `rm` |
+| 临时目录 | `$env:TEMP` | `$TMPDIR` 或 `/tmp` | `/tmp` |
+| 环境变量语法 | `$env:VAR`（PS）/ `%VAR%`（cmd） | `$VAR` | `$VAR` |
+| 二进制扩展名 | 带扩展名（`.exe` / `.cmd` / `.bat`） | 类 Unix（无强制扩展名） | 类 Unix（无强制扩展名） |
+
+**表格使用约束**：
+
+- 跨平台脚本：用语言内置 `path` / `fs` API，不用 shell 字符串拼接
+- 文档示例命令默认给类 Unix 版（macOS / Linux），Windows 差异在脚注或独立小节说明
+- 一次性脚本 / 调试代码也必须遵循对应平台的编码与行尾约束（不要因为「临时」就放宽）
 
 ## 反 anti-patterns
 
-- ❌ 把本 skill 内容当成「可选建议」——这是元规则，不是风格偏好。
-- ❌ 其它 `oms-*` skill 与本 skill 冲突时按其它 skill 走——必须以本 skill 为准。
-- ❌ 「这次任务很小，可以跳过元规则」——元规则无论任务大小一律生效。
-- ❌ 假定本 skill 已加载就跳过引用——冲突仲裁时仍需显式引用本 skill 的对应条目。
+- ❌ 把本 skill 内容当成「可选建议」——这是元规则，不是风格偏好
+- ❌ 其它 `oms-*` skill 与本 skill 冲突时按其它 skill 走——必须以本 skill 为准
+- ❌ 「这次任务很小，可以跳过元规则」——元规则无论任务大小一律生效
+- ❌ 假定本 skill 已加载就跳过引用——冲突仲裁时仍需显式引用本 skill 的对应条目
+- ❌ 在 Windows 上写文本文件不显式 UTF-8 无 BOM，导致中文乱码
+- ❌ 跨 skill 复制规则正文而非引用，导致同一规则在多处维护
+- ❌ 工具不可用时不停止，手工模拟或假装成功
+- ❌ 基于印象 / 过时记忆 / 训练数据假设事实，不做核实
