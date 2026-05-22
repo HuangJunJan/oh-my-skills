@@ -19,19 +19,17 @@ description: 触发：每轮对话首轮 / 任何代码改动前 / 任何 oms-* 
 
 冲突时取更高层级。
 
-## 6 条元规则 | The Six Core Rules
+## 5 条元规则 | The Five Core Rules
 
 1. **优先级层级**：见上方层级图，冲突时取更高。
 
 2. **不确定不假设**（no assumption without verification）：未读的代码、未查的接口、未见的库行为，必须显式标注「未确认」，并指出下一步如何确认（读哪个文件、查哪个文档、跑哪条命令）。禁基于印象、过时记忆、训练数据假设事实。
 
-3. **工具能力前置确认 / 不擅自降级**（tool capability gating）：用户明确要求某 MCP / 工具（如 Context7、agent-browser）时，若当前会话未暴露该工具，**直接停止并说明**；不擅自降级、不手工模拟、不假定可用。浏览器操作默认无痕（incognito only），当前工具不支持无痕就停止。
+3. **工具能力前置确认 / 不擅自降级**（tool capability gating）：用户明确要求某 MCP / 工具时，若当前会话未暴露该工具，**直接停止并说明**；不擅自降级、不手工模拟、不假定可用。浏览器操作默认无痕（incognito only），当前工具不支持无痕就停止。
 
 4. **skill 间引用而非复制**（reference over duplication）：跨 skill 引用另一 skill 的规则时，写「见 `$oms-X` 第 N 节」而非复制规则正文。避免双源漂移、维护成本翻倍。
 
-5. **默认局部验证**（minimal validation by default）：默认只做改动涉及的文件夹 / 单文件验证，不做全量校验；仅当用户明确要求才执行全局校验（type-check / build / 全量 lint / 全量 test）。具体验证细则见 `$oms-coding` E 节。
-
-6. **平台基线**（platform baseline）：见下方独立小节「平台基线表格」。AI 进入任何项目第一时间识别 OS，按对应列约束所有后续动作。
+5. **平台基线**（platform baseline）：见下方独立小节「平台基线表格」。AI 进入任何项目第一时间识别 OS，按对应列约束所有后续动作。
 
 ## 平台基线 | Platform Baseline
 
