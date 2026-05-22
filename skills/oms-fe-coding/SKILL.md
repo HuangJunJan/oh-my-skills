@@ -1,6 +1,6 @@
 ---
 name: oms-fe-coding
-description: 前端通用编码规范层——React/Vue/Svelte 状态与数据流、数据获取、样式与设计系统、渲染性能、可访问性 a11y、TS 在前端。叠加在 $oms-coding 之上。触发：前端代码改动(.tsx/.ts/.jsx/.js/.vue/.svelte/.css/.scss/.html)；前端项目编码任务(package.json 含 react/vue/svelte/next/nuxt/vite 等)。
+description: 触发：前端代码改动 (.tsx/.ts/.jsx/.js/.vue/.svelte/.css/.scss/.html)；前端项目编码任务 (package.json 含 react/vue/svelte/next/nuxt/vite 等)。OhMySkills 前端编码规范层——状态与数据流、数据获取、样式与设计系统、渲染性能、a11y、TS 在前端。叠加在 $oms-coding 之上。
 ---
 
 # 前端通用编码规范 | Frontend Coding Conventions

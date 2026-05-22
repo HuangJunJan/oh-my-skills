@@ -1,6 +1,6 @@
 ---
 name: oms-meta
-description: OhMySkills 最高优先级元规则集——优先级层级、元规则不可视为建议、skill 间冲突仲裁、不确定不假设、工具能力前置确认、skill 间引用而非复制、平台基线表格(win/mac/linux)。触发：任何对话开始时优先加载；任何代码改动之前；任何 oms-* skill 触发之前。
+description: 触发：每轮对话首轮 / 任何代码改动前 / 任何 oms-* skill 调用前。OhMySkills 最高优先级元规则集——优先级层级、不确定不假设、工具能力前置确认、reference-over-duplication、平台基线 (win/mac/linux)。
 ---
 
 # OhMySkills 元规则 | Meta Rules

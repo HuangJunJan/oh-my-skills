@@ -1,6 +1,6 @@
 ---
 name: oms-be-coding
-description: 后端通用编码规范层——API 设计与契约、数据层与持久化、错误处理与可观测性、并发与异步、安全与合规、配置与部署。叠加在 $oms-coding 之上。触发：后端代码改动(.go/.java/.kt/.py/.ts(Node)/.rs/.cs/.php/.rb/.sql)；后端项目编码任务(express/nestjs/fastify/koa/spring/django/flask/fastapi/gin/echo/actix 等)。
+description: 触发：后端代码改动 (.go/.java/.kt/.py/.ts(Node)/.rs/.cs/.php/.rb/.sql)；后端项目编码任务 (express/nestjs/fastify/koa/spring/django/flask/fastapi/gin/echo/actix 等)。OhMySkills 后端编码规范层——API 设计与契约、数据层与持久化、错误与可观测性、并发与异步、安全与合规、配置与部署。叠加在 $oms-coding 之上。
 ---
 
 # 后端通用编码规范 | Backend Coding Conventions
