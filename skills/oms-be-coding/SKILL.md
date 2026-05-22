@@ -13,7 +13,7 @@ description: 后端通用编码规范层——API 设计与契约、数据层与
 - **协议单一**：REST / RPC / GraphQL 选定后项目内不混用（一个微服务内）；跨服务协议在架构层统一。
 - **错误响应统一结构**：`{ code, message, details }` 三件套；HTTP 状态码语义正确（4xx 客户端错、5xx 服务端错，禁全返 200 包装 code）。
 - **schema 即真相**：请求 / 响应用 OpenAPI / Protobuf / JSON Schema 定义，禁口头约定 / 文档与代码漂移；优先用工具从 schema 生成类型与 client。
-- **鉴权统一中间件**：禁 handler 内散落鉴权 / 权限判断；权限粒度到 action（如 `order.refund`）而非角色（如 `admin`）。
+- **鉴权统一中间件**：禁 handler 内散落鉴权 / 权限判断；统一在中间件 / 拦截器 / guard 层完成（权限粒度规则见 E 节 authz）。
 
 ## B. 数据层与持久化 | Data and Persistence
 
@@ -45,7 +45,7 @@ description: 后端通用编码规范层——API 设计与契约、数据层与
 - **注入防护**：SQL / Command / LDAP / XPath 必用参数化查询 / 预编译 / escape；**禁字符串拼接 SQL**（`"... where id=" + userId` 是经典漏洞）。
 - **敏感数据保护**：密码 / token / 身份证 / 银行卡 / 手机号在日志脱敏 + DB 加密存储 + 网络 TLS 传输；脱敏在序列化层统一处理。
 - **密码哈希**：bcrypt / argon2 / scrypt，带 salt；**禁 md5 / sha1 / 明文 / 自造 hash**。
-- **authn ≠ authz**：authentication（你是谁）与 authorization（你能做什么）分清；权限到 action 而非角色，避免「admin 全能」反模式。
+- **authn ≠ authz**：authentication（你是谁）与 authorization（你能做什么）分清；权限粒度到 action（如 `order.refund`）而非角色（如 `admin`），避免「admin 全能」反模式。
 
 ## F. 配置与部署 | Configuration and Deployment
 

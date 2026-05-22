@@ -17,7 +17,9 @@ description: 前端通用编码规范层——React/Vue/Svelte 状态与数据�
 ## B. 数据获取与请求 | Data Fetching
 
 - **优先成熟方案**：React 用 SWR / TanStack Query；Vue 用 Pinia Colada / Vue Query；Svelte 用 SvelteKit `load` / TanStack Query。禁手写 `useEffect + fetch` 重新发明缓存 / 重试 / 竞态处理。
-- **类型显式**：请求参数 + 响应类型必须标注，禁 `any`。ID 字段统一 `string`（见 `$oms-coding` A 节）。
+- **接口字段为唯一事实源**（single source of truth）：以后端真实返回为唯一事实源，不依赖印象、过时文档、缓存记忆。先看接口实际响应再写类型。
+- **ID 字段统一 `string`**：无论后端定义为何类型（int / long / uuid），前端 / 调用方统一 `string` 处理，避免精度丢失与隐式转换。
+- **类型显式**：请求参数 + 响应类型必须标注，禁 `any`。
 - **竞态防护**（race condition）：用 `AbortController` 或请求 ID，丢弃过期响应。搜索 / 切 tab / 翻页等场景必做。
 - **错误统一拦截**：axios `interceptor` / `fetch` wrapper 集中处理鉴权过期、网络错误、业务错误码；禁组件内散落 `try-catch`。
 
@@ -47,7 +49,7 @@ description: 前端通用编码规范层——React/Vue/Svelte 状态与数据�
 - **props 类型从源头推导**：React 用 `ComponentProps<typeof X>` / `React.ComponentPropsWithoutRef<'button'>`；Vue 用 `defineProps<T>()`；从 OpenAPI / schema 生成的类型直接 `import type`，禁手写一遍。
 - **禁 `any`**：必要时用 `unknown` + 类型守卫（`typeof` / `in` / 自定义谓词）。
 - **工具类型优先**：`Pick` / `Omit` / `Partial` / `Required` / `ReturnType` / `Awaited` 优先于手写重定义。
-- **不玩条件类型炫技**：复杂条件类型 + 映射类型禁过度，可读性 > 表达力（详见 `$oms-coding` B 节「不做类型体操」）。
+- **类型可读性优于表达力**：见 `$oms-coding` B 节「不做类型 / 泛型炫技」。
 
 ## 反 anti-patterns
 

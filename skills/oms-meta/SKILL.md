@@ -5,7 +5,7 @@ description: OhMySkills 最高优先级元规则集——优先级层级、元�
 
 # OhMySkills 元规则 | Meta Rules
 
-本 skill 是 OhMySkills 的**最高优先级元规则集**，应优先于其它 `oms-*` skill 加载。任何 `oms-qa` / `oms-coding` / `oms-fe-coding` / 未来新增 `oms-*` skill 与本 skill 冲突时，**以本 skill 为准**。
+本 skill 是 OhMySkills 的**最高优先级元规则集**，应优先于其它 `oms-*` skill 加载。
 
 **优先级层级**（priority chain，从高到低）：
 
@@ -21,7 +21,7 @@ description: OhMySkills 最高优先级元规则集——优先级层级、元�
 
 ## 6 条元规则 | The Six Core Rules
 
-1. **优先级层级**：用户当次对话明确要求 > 项目级 `AGENTS.md`（更近层级）> 本 `oms-meta` 元规则 > 其它 `oms-*` skills 默认行为 > 工具内置默认。冲突时取更高。
+1. **优先级层级**：见上方层级图，冲突时取更高。
 
 2. **不确定不假设**（no assumption without verification）：未读的代码、未查的接口、未见的库行为，必须显式标注「未确认」，并指出下一步如何确认（读哪个文件、查哪个文档、跑哪条命令）。禁基于印象、过时记忆、训练数据假设事实。
 
@@ -58,9 +58,7 @@ OhMySkills 面向多平台开发者分发。AI 在以下三大平台执行任何
 
 ## 反 anti-patterns
 
-- ❌ 把本 skill 内容当成「可选建议」——这是元规则，不是风格偏好
-- ❌ 其它 `oms-*` skill 与本 skill 冲突时按其它 skill 走——必须以本 skill 为准
-- ❌ 「这次任务很小，可以跳过元规则」——元规则无论任务大小一律生效
+- ❌ 把本 skill 内容当成「可选建议」或「任务小就跳过」——元规则无论任务大小一律生效
 - ❌ 假定本 skill 已加载就跳过引用——冲突仲裁时仍需显式引用本 skill 的对应条目
 - ❌ 在 Windows 上写文本文件不显式 UTF-8 无 BOM，导致中文乱码
 - ❌ 跨 skill 复制规则正文而非引用，导致同一规则在多处维护
