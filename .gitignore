@@ -4,9 +4,8 @@
 # Trellis 工作流（任务、journal、spec 等本地方法论文件，不公开）
 .trellis/
 .claude/
-
-# 历史参考样本（含本地账号密码，不公开）
-now.md
+.agents/
+.codex/
 
 # 编辑器
 .vscode/

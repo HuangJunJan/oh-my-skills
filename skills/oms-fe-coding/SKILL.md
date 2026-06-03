@@ -18,7 +18,7 @@ description: 触发：前端代码改动 (.tsx/.ts/.jsx/.js/.vue/.svelte/.css/.s
 ## 2. 请求与接口契约
 
 - 以后端真实返回、OpenAPI/schema、mock server 或抓包结果为事实源；不要凭记忆写类型。
-- 请求参数和响应显式类型化，禁 `any`；ID 在前端统一按 `string` 处理。
+- 请求参数和响应显式类型化，禁 `any`；ID 类型以后端契约为准，涉及长整型、展示、路由参数、表单值时前端优先按 `string` 处理，避免精度丢失和隐式转换。
 - 优先使用项目既有请求封装、SWR/TanStack Query/Vue Query/框架 load，不手写缓存、重试、竞态。
 - 搜索、切 tab、分页、路由切换等会产生竞态的场景，用 AbortController、请求 ID 或框架能力丢弃过期响应。
 - 鉴权过期、网络错误、业务错误码走统一拦截/封装，不在组件里散落重复 `try-catch`。
