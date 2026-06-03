@@ -1,6 +1,6 @@
 ---
 name: oms-meta
-description: 触发：每次对话 / 任何代码改动前 / 任何 oms-* skill 调用前。OhMySkills 最高优先级元规则：优先级、事实核验、工具能力、平台基线、证据完整性、skill 维护边界。
+description: 触发：每次对话 / 任何代码改动前 / 任何 oms-* skill 调用前。OhMySkills 最高优先级元规则：优先级、事实核验、工具能力、平台基线、证据完整性、skill 分层维护边界。
 ---
 
 # OhMySkills 元规则 | Meta Rules
@@ -37,11 +37,17 @@ description: 触发：每次对话 / 任何代码改动前 / 任何 oms-* skill 
 
 ## 4. 平台基线
 
-- 进入项目先识别 OS、shell、包管理器、脚本入口和编码约束。
-- Windows 文本 IO 必须显式 UTF-8；PowerShell 与 bash 命令不可互译。
-- 路径用语言内置 `path` / `fs` API 处理，不手拼分隔符。
-- 行尾遵循仓库配置；不要主动引入格式化、换行或权限噪音。
-- 临时文件放系统临时目录或项目既有临时目录，不丢在仓库根目录。
+进入项目先识别 OS、shell、工作目录、包管理器、脚本入口、编码和行尾约束。
+
+| 关键点 | PowerShell | cmd | POSIX shell | 统一要求 |
+|---|---|---|---|---|
+| 环境变量 | `$env:NAME` | `%NAME%` | `$NAME` | 按当前 shell 语法写，不互译。 |
+| 命令语法 | 对象管道、反引号转义 | 批处理变量和转义 | bash/sh 引号、通配符、重定向 | 引号、管道、通配符、重定向按当前 shell 处理。 |
+| 文本读写 | 显式 UTF-8 without BOM | 显式 UTF-8 without BOM | 显式 UTF-8 without BOM | 所有平台统一 UTF-8 without BOM，不依赖系统默认编码。 |
+| 路径与行尾 | 注意盘符、反斜杠、空格、CRLF | 注意盘符、反斜杠、空格、CRLF | 注意大小写、`/`、LF、可执行位 | 代码里用路径 API；遵循 `.gitattributes` 和仓库现状。 |
+| 工具与输出 | 以 lockfile、脚本、既有临时目录为准 | 同左 | 同左 | 不混用包管理器；临时文件不丢仓库根目录。 |
+
+平台不兼容导致命令失败时，先调整命令或工具调用方式，不把平台问题误判成代码缺陷。
 
 ## 5. 证据完整性
 
@@ -50,15 +56,20 @@ description: 触发：每次对话 / 任何代码改动前 / 任何 oms-* skill 
 - 不隐藏失败、不吞错误、不写假成功报告。
 - 最终回复只报告真实完成的事。
 
-## 6. Skill 维护
+## 6. Skill 分层维护
 
 - 跨 skill 共用规则只保留在一个最合适的位置，其它 skill 用 `$oms-X` 引用。
 - Skill 内容保持精简；只写会改变 agent 行为的规则。
+- `description` 必须写清触发场景；正文只写触发后的执行规则。
 - 领域 skill 只写领域差异，不复制 `$oms-coding` 的通用纪律。
+- 修改 skill 时同步检查 README 技能表、示例触发、安装说明和相关 agent 元数据。
 
 ## 反 anti-patterns
 
 - ❌ 基于印象判断库/API 行为，不读代码或官方文档。
 - ❌ 工具不可用时手工模拟结果。
 - ❌ 同一条规则复制到多个 skill，后续维护漂移。
+- ❌ 把触发条件只写在正文里，导致 agent 自动加载不到。
+- ❌ 用 bash 写法在 PowerShell 里硬跑，或反过来把 PowerShell 写法当 POSIX shell。
+- ❌ 读写文本文件依赖系统默认编码，或写出带 BOM 的 UTF-8。
 - ❌ 小改动引入无关格式化、行尾、权限或目录噪音。
