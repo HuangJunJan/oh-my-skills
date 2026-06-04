@@ -42,7 +42,7 @@ When adding, changing, or removing a skill, also check:
   - `oms-coding`: general coding execution discipline.
   - `oms-be-coding` / `oms-fe-coding`: backend/frontend domain differences.
   - `oms-review`: review of diffs, PRs, code, and designs.
-- Shared rules appear in one best source only; other skills should reference `$oms-X` instead of copying.
+- Shared rules appear in one best source only; other skills should reference `$oms-X` instead of copying. In a skill body, `$oms-X` is a cross-skill pointer meaning "see the oms-X skill", not copied rule text.
 
 ## Content boundaries
 

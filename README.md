@@ -63,7 +63,7 @@ npx skills add HuangJunJan/oh-my-skills -s oms-meta -s oms-coding -s oms-review
 npx skills add HuangJunJan/oh-my-skills -g
 
 # 版本钉（推荐团队协作时使用）
-npx skills add HuangJunJan/oh-my-skills@v0.2.7
+npx skills add HuangJunJan/oh-my-skills@<tag>
 npx skills add HuangJunJan/oh-my-skills@<commit-sha>
 
 # 远端列出仓库里有哪些 skill（不安装）
@@ -152,7 +152,7 @@ npx skills remove
 | Roo Code | `roo` | `./.roo/skills/` | `~/.roo/skills/` |
 | Universal（通用兜底） | `universal` | `./.agents/skills/` | `~/.agents/skills/` |
 
-> Universal agents 共享 `./.agents/skills/` 作为 canonical 路径；Claude Code 是 non-universal（独立 `.claude/skills/`）。agent 特定目录是 junction / symlink 指向 canonical，节省磁盘且改一处全生效。
+> Universal agents 共享 `./.agents/skills/` 作为 canonical 路径；Claude Code / Windsurf / Kiro / Roo 是 non-universal（各有独立目录 `.claude/` / `.windsurf/` / `.kiro/` / `.roo/`）。agent 特定目录是 junction / symlink 指向 canonical，节省磁盘且改一处全生效。
 
 ---
 
@@ -191,7 +191,7 @@ npx skills remove
 推荐用 tag 或 commit sha：
 
 ```bash
-npx skills add HuangJunJan/oh-my-skills@v0.2.7
+npx skills add HuangJunJan/oh-my-skills@<tag>
 npx skills add HuangJunJan/oh-my-skills@<commit-sha>
 ```
 
