@@ -34,7 +34,7 @@ npx skills add HuangJunJan/oh-my-skills --all
 | `oms-coding` | 通用编码执行：先读再改、复用优先、最小改动、根因修复、验证、交付前自检 | 任何代码改动 / 新增 / 删除 / 验证 / 交付任务 |
 | `oms-be-coding` | 后端领域规范：API 契约、数据层、错误可观测性、并发韧性、安全配置、后端验证 | 后端代码或后端项目编码任务 |
 | `oms-fe-coding` | 前端领域规范：状态分层、接口契约、UI/a11y、性能、TypeScript、前端验证 | 前端代码或前端项目编码任务 |
-| `oms-review` | 通用审查规范：事实核验、风险分级、必须修 vs 建议、输出格式、误报防护 | 代码审查 / PR review / diff review / 方案 review / 安全审查 |
+| `oms-review` | 通用审查规范：事实核验、风险分级、必须修 vs 建议、安全/性能/测试/兼容迁移/依赖/文档逐项排查、输出格式、误报防护 | 代码审查 / PR review / diff review / 方案 review / 安全审查 |
 
 这些 skill 都靠 description 关键词由 AI 自动触发，不需要 slash command、不需要手动初始化、不在用户项目里创建任何额外目录。
 
