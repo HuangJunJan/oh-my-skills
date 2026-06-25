@@ -56,9 +56,9 @@ description: 触发：后端代码改动 (.go/.java/.kt/.py/.ts(Node)/.rs/.cs/.p
 
 ## 反 anti-patterns
 
-- ❌ handler 内散落权限判断。
-- ❌ 捕获异常后返回成功或空结果。
-- ❌ 事务里调用外部服务。
-- ❌ SQL 字符串拼接用户输入。
-- ❌ 裸 `go func` / `setTimeout` / background task 无超时和失败记录。
-- ❌ 生产配置、token、连接串硬编码进代码或 `.env.example`。
+- 避免：handler 内散落权限判断。
+- 避免：捕获异常后返回成功或空结果。
+- 避免：事务里调用外部服务。
+- 避免：SQL 字符串拼接用户输入。
+- 避免：裸 `go func` / `setTimeout` / background task 无超时和失败记录。
+- 避免：生产配置、token、连接串硬编码进代码或 `.env.example`。

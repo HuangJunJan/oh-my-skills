@@ -33,7 +33,7 @@ npx skills add HuangJunJan/oh-my-skills --all
 | `oms-qa` | 通用问答交互：中文默认、先结论、少问多查、推荐优先、需求收敛、盘问 / 严审模式 | 每轮对话默认；用户要求盘问、严审、挑战方案、stress-test、grill me 时 |
 | `oms-coding` | 通用编码执行：先读再改、复用优先、最小改动、根因修复、验证、交付前自检 | 任何代码改动 / 新增 / 删除 / 验证 / 交付任务 |
 | `oms-be-coding` | 后端领域规范：API 契约、数据层、错误可观测性、并发韧性、安全配置、后端验证 | 后端代码或后端项目编码任务 |
-| `oms-fe-coding` | 前端领域规范：状态分层、接口契约、UI/a11y、性能、TypeScript、前端验证 | 前端代码或前端项目编码任务 |
+| `oms-fe-coding` | 前端领域规范：状态分层、真实数据源驱动、接口契约、UI/a11y、性能、TypeScript、前端验证 | 前端代码、前端项目编码、页面对接真实接口 / mock 替换任务 |
 | `oms-review` | 通用审查规范：事实核验、风险分级、必须修 vs 建议、安全/性能/测试/兼容迁移/依赖/文档逐项排查、输出格式、误报防护 | 代码审查 / PR review / diff review / 方案 review / 安全审查 |
 
 这些 skill 都靠 description 关键词由 AI 自动触发，不需要 slash command、不需要手动初始化、不在用户项目里创建任何额外目录。
@@ -91,6 +91,7 @@ npx skills add HuangJunJan/oh-my-skills --list
 | “改一下这个组件” / “加个新接口” | `oms-coding` | 通用编码执行规范 |
 | “给 NestJS 加一个接口” / “修 SQL 查询” | `oms-coding` + `oms-be-coding` | 通用编码 + 后端领域规范 |
 | “改 Vue 页面布局” / “修 React hook” | `oms-coding` + `oms-fe-coding` | 通用编码 + 前端领域规范 |
+| “把页面 mock 换成真实接口” / “按接口契约调整回显和提交字段” | `oms-coding` + `oms-fe-coding` | 真实数据源驱动的前端落地 |
 | “帮我 review 这个 PR / diff / 方案” | `oms-review` | 审查规范 |
 | “改一下 .env 文件” | `oms-coding` | 敏感边界：默认只读，需明确要求 |
 | “跑一下全量 build / publish” | `oms-coding` + `oms-meta` | 敏感命令：先说明原因并确认 |

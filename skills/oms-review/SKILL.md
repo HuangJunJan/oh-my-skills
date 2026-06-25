@@ -37,7 +37,7 @@ description: 触发：代码审查 / PR review / diff review / 方案 review / �
 - 是否有生成文件、lockfile、snapshot、migration、API client 等改动；这些改动是否能追溯到源变更。
 - 是否有调试代码、临时文件、真实凭证、无关格式化、行尾或权限噪音。
 
-安全（逐项排查，不止笼统说“注意边界”；逐项对照与 ❌/✅ 示例见 `references/security-review.md`）：
+安全（逐项排查，不止笼统说“注意边界”；坏例/好例对照见 `references/security-review.md`）：
 
 - 注入面：SQL / 命令 / 路径穿越 / 模板 / 不安全反序列化，以及用户输入直接拼进敏感操作。
 - 认证授权：鉴权缺失、越权访问、权限判断绕过、会话与 CSRF 防护。
@@ -99,18 +99,18 @@ description: 触发：代码审查 / PR review / diff review / 方案 review / �
 
 ## 6. 参考清单
 
-正文给判据，细化的 ❌/✅ 对照和逐项勾选在 `references/` 下，按需加载（不支持自动加载的工具可手动打开）：
+正文给判据，细化的坏例/好例对照和逐项勾选在 `references/` 下，按需加载（不支持自动加载的工具可手动打开）：
 
-- `references/security-review.md` — 安全审查：注入 / 认证授权 / 敏感数据 / SSRF / XXE / CORS 的 ❌/✅ 对照。
-- `references/performance-review.md` — 性能审查：复杂度 / N+1 / 资源泄漏 / 网络调用 / 缓存的 ❌/✅ 对照。
+- `references/security-review.md` — 安全审查：注入 / 认证授权 / 敏感数据 / SSRF / XXE / CORS 的坏例/好例对照。
+- `references/performance-review.md` — 性能审查：复杂度 / N+1 / 资源泄漏 / 网络调用 / 缓存的坏例/好例对照。
 - `references/review-checklist.md` — 完整 review checklist：覆盖 §3 全部维度的逐项勾选模板。
 
 reference 沿用本 skill §2 的 Blocker/Major/Minor/Nit 分级；其中的阈值仅作参考，不当硬性门槛。
 
 ## 反 anti-patterns
 
-- ❌ 没读调用链就说“这里可能有问题”。
-- ❌ 把所有建议都标成严重问题。
-- ❌ 用“建议优化一下”代替具体影响和修法。
-- ❌ 为了凑数量列出无关 nit。
-- ❌ 没验证就声称测试通过或风险已排除。
+- 避免：没读调用链就说“这里可能有问题”。
+- 避免：把所有建议都标成严重问题。
+- 避免：用“建议优化一下”代替具体影响和修法。
+- 避免：为了凑数量列出无关 nit。
+- 避免：没验证就声称测试通过或风险已排除。

@@ -1,6 +1,6 @@
 # 性能审查清单 | Performance Review
 
-`$oms-review` §3「性能与资源」的展开。逐项排查算法、数据库、内存资源、网络 IO、缓存、并发;每条给 ❌/✅ 对照。多数性能修法属于 `$oms-be-coding` §2/§4 领域,这里只作审查时的判据与最小示例。
+`$oms-review` §3「性能与资源」的展开。逐项排查算法、数据库、内存资源、网络 IO、缓存、并发;每条给 坏例/好例 对照。多数性能修法属于 `$oms-be-coding` §2/§4 领域,这里只作审查时的判据与最小示例。
 
 > 先测量再优化:把"可能慢"标为 Minor/建议,除非有明确瓶颈证据或属于热路径才提级。不要凭直觉把可读实现当缺陷。
 > 示例语言只为说明问题形态,概念跨语言通用——对照本语言等价写法即可。
@@ -12,7 +12,7 @@
 ### O(n²) 查重(Java)
 
 ```java
-// ❌ O(n²):嵌套循环
+// 坏例： O(n²):嵌套循环
 boolean hasDup(int[] a) {
     for (int i = 0; i < a.length; i++)
         for (int j = i + 1; j < a.length; j++)
@@ -20,7 +20,7 @@ boolean hasDup(int[] a) {
     return false;
 }
 
-// ✅ O(n):集合一次遍历
+// 好例： O(n):集合一次遍历
 boolean hasDup(int[] a) {
     Set<Integer> seen = new HashSet<>();
     for (int x : a) if (!seen.add(x)) return true;
@@ -31,10 +31,10 @@ boolean hasDup(int[] a) {
 ### 成员判断(TypeScript)
 
 ```typescript
-// ❌ 数组成员判断 O(n)
+// 坏例： 数组成员判断 O(n)
 if (validIds.includes(userId)) { /* ... */ }   // validIds: number[]
 
-// ✅ Set O(1)
+// 好例： Set O(1)
 const ids = new Set(validIds);
 if (ids.has(userId)) { /* ... */ }
 ```
@@ -46,43 +46,43 @@ if (ids.has(userId)) { /* ... */ }
 ### N+1 查询(TS / ORM)
 
 ```typescript
-// ❌ 懒加载在循环里触发 N 次查询
+// 坏例： 懒加载在循环里触发 N 次查询
 const users = await User.findAll();
 for (const u of users) await u.getOrders();
 
-// ✅ 关联预载,一次取回
+// 好例： 关联预载,一次取回
 const users = await User.findAll({ include: [Order] });
 ```
 
 ### SELECT * 与列裁剪(SQL)
 
 ```sql
--- ❌ 取回 50 列只用 3 列
+-- 坏例： 取回 50 列只用 3 列
 SELECT * FROM users WHERE status = 'active';
 
--- ✅ 只取需要的列
+-- 好例： 只取需要的列
 SELECT id, name, email FROM users WHERE status = 'active';
 ```
 
 ### 索引(SQL)
 
 ```sql
--- ❌ WHERE 命中无索引列,全表扫描
+-- 坏例： WHERE 命中无索引列,全表扫描
 SELECT * FROM orders WHERE user_id = 123 AND status = 'pending';
 
--- ✅ 复合索引(最常用/最有选择性的列在前)
+-- 好例： 复合索引(最常用/最有选择性的列在前)
 CREATE INDEX idx_orders_user_status ON orders(user_id, status);
 ```
 
 ### 关联子查询 → JOIN(SQL)
 
 ```sql
--- ❌ 相关子查询逐行执行
+-- 坏例： 相关子查询逐行执行
 SELECT name,
        (SELECT COUNT(*) FROM orders WHERE user_id = u.id) AS cnt
 FROM users u;
 
--- ✅ 一次 JOIN + 聚合
+-- 好例： 一次 JOIN + 聚合
 SELECT u.name, COUNT(o.id) AS cnt
 FROM users u LEFT JOIN orders o ON u.id = o.user_id
 GROUP BY u.id, u.name;
@@ -91,10 +91,10 @@ GROUP BY u.id, u.name;
 ### 分页(Java / Spring Data)
 
 ```java
-// ❌ 全表载入内存
+// 坏例： 全表载入内存
 return repo.findAll().stream().map(this::toDto).toList();
 
-// ✅ 按页取
+// 好例： 按页取
 Page<User> page = repo.findAll(PageRequest.of(p, size));
 return page.map(this::toDto);
 ```
@@ -106,11 +106,11 @@ return page.map(this::toDto);
 ### 资源未关闭(Java)
 
 ```java
-// ❌ 流未关闭,句柄泄漏
+// 坏例： 流未关闭,句柄泄漏
 InputStream in = new FileInputStream(name);
 return in.readAllBytes();
 
-// ✅ try-with-resources 确保释放
+// 好例： try-with-resources 确保释放
 try (InputStream in = new FileInputStream(name)) {
     return in.readAllBytes();
 }
@@ -119,11 +119,11 @@ try (InputStream in = new FileInputStream(name)) {
 ### 大数据流式处理(Go)
 
 ```go
-// ❌ 一次性读入超大文件
+// 坏例： 一次性读入超大文件
 data, _ := os.ReadFile("big.csv")
 for _, line := range strings.Split(string(data), "\n") { process(line) }
 
-// ✅ 逐行扫描,内存恒定
+// 好例： 逐行扫描,内存恒定
 f, _ := os.Open("big.csv")
 defer f.Close()
 sc := bufio.NewScanner(f)
@@ -133,14 +133,14 @@ for sc.Scan() { process(sc.Text()) }
 ### 连接池(Node / TS)
 
 ```typescript
-// ❌ 每次新建连接
+// 坏例： 每次新建连接
 for (const req of reqs) {
   const c = await createConnection();
   await c.query(req);
   await c.end();
 }
 
-// ✅ 池化复用
+// 好例： 池化复用
 const pool = new Pool({ max: 10 });
 for (const req of reqs) await pool.query(req);
 ```
@@ -152,21 +152,21 @@ for (const req of reqs) await pool.query(req);
 ### 阻塞 → 并发(TS)
 
 ```typescript
-// ❌ 顺序 await,N 个请求串行等待
+// 坏例： 顺序 await,N 个请求串行等待
 const results = [];
 for (const u of urls) results.push(await fetch(u).then(r => r.json()));
 
-// ✅ 并发发起
+// 好例： 并发发起
 const results = await Promise.all(urls.map(u => fetch(u).then(r => r.json())));
 ```
 
 ### 缺超时(Go)
 
 ```go
-// ❌ 无超时,可无限挂起
+// 坏例： 无超时,可无限挂起
 http.Get(url)
 
-// ✅ 带超时的 context
+// 好例： 带超时的 context
 ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 defer cancel()
 req, _ := http.NewRequestWithContext(ctx, "GET", url, nil)
@@ -178,11 +178,11 @@ http.DefaultClient.Do(req)
 ### 批量代替逐条(Python)
 
 ```python
-# ❌ 逐个 API 调用
+# 坏例： 逐个 API 调用
 for i in ids:
     api.get(f"/items/{i}")
 
-# ✅ 批量端点
+# 好例： 批量端点
 api.post("/items/batch", json={"ids": ids})
 ```
 
@@ -193,11 +193,11 @@ api.post("/items/batch", json={"ids": ids})
 ### 记忆化(Python)
 
 ```python
-# ❌ 指数级重算
+# 坏例： 指数级重算
 def fib(n):
     return n if n <= 1 else fib(n - 1) + fib(n - 2)
 
-# ✅ 记忆化
+# 好例： 记忆化
 @lru_cache(maxsize=None)
 def fib(n):
     return n if n <= 1 else fib(n - 1) + fib(n - 2)
@@ -210,10 +210,10 @@ def fib(n):
 ## 6. 前端专项(JavaScript)
 
 ```javascript
-// ❌ 重复 O(n) 查找
+// 坏例： 重复 O(n) 查找
 users.forEach(u => departments.find(d => d.id === u.deptId));
 
-// ✅ 预建查找表 O(1)
+// 好例： 预建查找表 O(1)
 const map = new Map(departments.map(d => [d.id, d]));
 users.forEach(u => map.get(u.deptId));
 ```
