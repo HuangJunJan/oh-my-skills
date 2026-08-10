@@ -12,7 +12,7 @@
 **Done When:**
 - 废弃的规则已从所有引用中移除
 - DEPRECATED 标记的规则有明确到期日期
-- 变更已记入 ANTI-TEMPLATES.md 的 Deprecation Log
+- 记入 CHANGELOG 或 git commit message 的 Deprecation Log
 
 ---
 
@@ -47,7 +47,7 @@
 
 ### 第三步：记录
 
-把废弃决定记入 `ANTI-TEMPLATES.md` 的 Deprecation Log：
+把废弃决定记入 git commit message 或 CHANGELOG：
 
 ```markdown
 - YYYY-MM-DD: 废弃了 `rules/xxx.md`，原因是 <原因>，替代方案是 <新规则位置>
@@ -77,8 +77,6 @@
 
 每季度或重大模板更新后，用两个**真实不同类型**的项目跑同一套 Quick Start，`diff -r` 对比：
 
-- `hooks/`、`protocol-blocks/` 骨架文件应该几乎一样
+- `hooks/` 骨架文件应该几乎一样
 - `rules/`、`SKILL.md` 的 Common Tasks、`gotchas.md` 应该完全不同
 - 如果一样，说明模板越界了
-
-检查结果记入 `ANTI-TEMPLATES.md` 的 Homogeneity Drift Log。

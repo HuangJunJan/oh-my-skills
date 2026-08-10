@@ -61,24 +61,9 @@ skills/oms-*/
 └── scripts/              ← 可选：自检脚本
 
 shells/                    ← 薄壳模板（AGENTS.md / CLAUDE.md / CODEX.md / GEMINI.md）
-hooks/                     ← SessionStart + PreToolUse 双钩子（对抗上下文压缩）
-  ├── session-start.sh     ← startup / clear / compact 后自动重注 SKILL.md
-  ├── pre-tool-use.sh      ← 编辑核心规则文件前拦截越权修改
-  ├── hooks.json           ← Claude Code 配置
-  └── hooks-cursor.json    ← Cursor 配置
-protocol-blocks/           ← 可插拔协议增强块
-  ├── rationalizations-table.md  ← 借口拦截表（从真实失败抄录）
-  ├── red-flags-stop.md         ← 红线 STOP 块
-  └── subagent-contract.md      ← 子 Agent 合约模板
-templates/skill/           ← 脚手架模板（结构可复用，内容禁止预制）
-  ├── SKILL.md
-  ├── rules/
-  ├── workflows/
-  └── references/gotchas.md
-ANTI-TEMPLATES.md          ← 反预制清单 + Deprecation Log + Drift Log
+hooks/                     ← 可选：SessionStart + PreToolUse 双钩子（见安装说明）
 scripts/
-  ├── smoke-test.sh        ← 全量结构完整性自检（125 项）
-  └── test-trigger.sh      ← description 触发率测试
+  └── smoke-test.sh        ← 全量结构完整性自检
 ```
 
 ---
@@ -173,25 +158,17 @@ npx skills remove oms-meta oms-qa oms-coding oms-be-coding oms-fe-coding oms-rev
 
 ---
 
-## 安装钩子（hooks）
+## 安装钩子（可选）
 
-项目提供两套钩子机制，需要手动安装到对应 harness：
-
-### Claude Code
+`hooks/` 目录提供 SessionStart + PreToolUse 双钩子，用于对抗长会话上下文压缩。**不是必须的**——薄壳路由表已覆盖 80% 场景，钩子只补长会话/多 compact 场景下的最后 20%。
 
 ```bash
+# Claude Code
 cp hooks/hooks.json .claude/hooks.json
-```
 
-### Cursor
-
-```bash
+# Cursor
 cp hooks/hooks-cursor.json .cursor/hooks.json
 ```
-
-钩子作用：
-- **SessionStart**：在 `startup / clear / compact` 事件后自动将 `oms-meta/SKILL.md` 注入上下文，防止压缩后规则丢失
-- **PreToolUse**：在编辑核心规则文件（如 `SKILL.md`、`rules/priority.md`）前拦截越权修改，防止文件超过 100 行
 
 ---
 

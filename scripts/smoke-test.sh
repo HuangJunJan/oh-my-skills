@@ -98,27 +98,8 @@ echo ""
 # Hooks check
 echo "--- hooks ---"
 for f in session-start.sh pre-tool-use.sh hooks.json hooks-cursor.json; do
-  check "  hooks/$f exists" test -f "$ROOT/hooks/$f"
+  warn "  hooks/$f exists (optional — install manually)" test -f "$ROOT/hooks/$f"
 done
-echo ""
-
-# Protocol blocks check
-echo "--- protocol-blocks ---"
-for f in rationalizations-table.md red-flags-stop.md subagent-contract.md; do
-  check "  protocol-blocks/$f exists" test -f "$ROOT/protocol-blocks/$f"
-done
-echo ""
-
-# Templates check
-echo "--- templates ---"
-check "  templates/skill/SKILL.md exists" test -f "$ROOT/templates/skill/SKILL.md"
-check "  templates/skill/references/gotchas.md exists" test -f "$ROOT/templates/skill/references/gotchas.md"
-check "  templates/skill/workflows/fix-bug.md exists" test -f "$ROOT/templates/skill/workflows/fix-bug.md"
-echo ""
-
-# ANTI-TEMPLATES check
-echo "--- anti-templates ---"
-check "  ANTI-TEMPLATES.md exists" test -f "$ROOT/ANTI-TEMPLATES.md"
 echo ""
 
 # Cross-reference integrity
