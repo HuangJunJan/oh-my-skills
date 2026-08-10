@@ -1,0 +1,4 @@
+{
+  "sessionStart": "bash hooks/session-start.sh",
+  "preToolUse": "bash hooks/pre-tool-use.sh"
+}

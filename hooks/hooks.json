@@ -1,0 +1,14 @@
+{
+  "hooks": [
+    {
+      "type": "session-start",
+      "command": "bash hooks/session-start.sh",
+      "description": "在 startup / clear / compact 后自动重注 primary SKILL.md"
+    },
+    {
+      "type": "pre-tool-use",
+      "command": "bash hooks/pre-tool-use.sh",
+      "description": "在编辑核心规则文件前拦截越权修改"
+    }
+  ]
+}

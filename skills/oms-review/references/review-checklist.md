@@ -1,6 +1,6 @@
 # 完整审查清单 | Review Checklist
 
-`$oms-review` 的系统性兜底清单,按审查顺序排列。**级别沿用 `$oms-review` §2 的 Blocker / Major / Minor / Nit,不另立标准。** 这是检查项,不是硬指标——不要把它当成"必须全勾"的形式门槛,按变更类型取相关部分。安全/性能细项分别见 `security-review.md` / `performance-review.md`。
+`$oms-review` 的系统性兜底清单,按审查顺序排列。**级别沿用 `rules/risk-levels.md` 的 Blocker / Major / Minor / Nit,不另立标准。** 这是检查项,不是硬指标——不要把它当成"必须全勾"的形式门槛,按变更类型取相关部分。安全/性能细项分别见 `security-review.md` / `performance-review.md`。
 
 ---
 
@@ -77,7 +77,7 @@
 
 ## 定级映射
 
-| 本清单命中 | `$oms-review` 级别 |
+| 本清单命中 | `rules/risk-levels.md` 级别 |
 |---|---|
 | 数据损坏 / 安全漏洞 / 线上不可用 / 破坏公开契约 | **Blocker** |
 | 明显 bug / 竞态 / 越权 / 错误处理缺失 / 测试会失败 | **Major** |
@@ -89,4 +89,4 @@
 - 自动工具(linter / formatter / scanner)先跑,机械问题不靠人工挑。
 - 把人工精力放在安全、业务逻辑、公开契约上,不在风格上 bikeshed。
 - 每条问题给"级别 + 位置 + 影响 + 最小修法",不止指出问题。
-- 没有实质问题就明确说"未发现需要阻塞的缺陷",不为凑数硬挑 nit(见 `$oms-review` 反 anti-patterns)。
+- 没有实质问题就明确说"未发现需要阻塞的缺陷",不为凑数硬挑 nit(见 SKILL.md Red Flags)。

@@ -1,6 +1,6 @@
 # 性能审查清单 | Performance Review
 
-`$oms-review` §3「性能与资源」的展开。逐项排查算法、数据库、内存资源、网络 IO、缓存、并发;每条给 坏例/好例 对照。多数性能修法属于 `$oms-be-coding` §2/§4 领域,这里只作审查时的判据与最小示例。
+$oms-review SKILL.md Common Tasks「性能审查」的展开。逐项排查算法、数据库、内存资源、网络 IO、缓存、并发;每条给 坏例/好例 对照。多数性能修法属于 `$oms-be-coding` 领域,这里只作审查时的判据与最小示例。
 
 > 先测量再优化:把"可能慢"标为 Minor/建议,除非有明确瓶颈证据或属于热路径才提级。不要凭直觉把可读实现当缺陷。
 > 示例语言只为说明问题形态,概念跨语言通用——对照本语言等价写法即可。
@@ -173,7 +173,7 @@ req, _ := http.NewRequestWithContext(ctx, "GET", url, nil)
 http.DefaultClient.Do(req)
 ```
 
-外部调用还应审查重试与退避、限流/熔断(见 `$oms-be-coding` §4),重试必须避免放大故障。
+外部调用还应审查重试与退避、限流/熔断(见 `$oms-be-coding/rules/concurrency.md`),重试必须避免放大故障。
 
 ### 批量代替逐条(Python)
 
@@ -218,7 +218,7 @@ const map = new Map(departments.map(d => [d.id, d]));
 users.forEach(u => map.get(u.deptId));
 ```
 
-前端还需审查:大列表是否虚拟滚动、列表 key 是否稳定唯一、render 阶段是否创建昂贵对象或触发副作用(见 `$oms-fe-coding` §4)。
+前端还需审查:大列表是否虚拟滚动、列表 key 是否稳定唯一、render 阶段是否创建昂贵对象或触发副作用(见 `$oms-fe-coding/rules/ui-a11y.md`)。
 
 ---
 
@@ -231,4 +231,4 @@ users.forEach(u => map.get(u.deptId));
 - [ ] 重复计算是否缓存;缓存键是否稳定、是否设过期、写时是否失效
 - [ ] 前端大列表是否虚拟化、key 是否稳定、render 是否创建昂贵对象
 
-> 性能问题给出可观测依据(复杂度、查询次数、热路径),不凭直觉。无法实测时按 `$oms-review` §5 说明这是静态判断及剩余不确定性。
+> 性能问题给出可观测依据(复杂度、查询次数、热路径),不凭直觉。无法实测时按 `rules/output-format.md` §审查边界 说明这是静态判断及剩余不确定性。

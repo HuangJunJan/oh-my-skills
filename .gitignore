@@ -1,10 +1,9 @@
 # 安装备份（vercel-labs/skills 冲突保护时可能生成）
 *.bak
 
-# Trellis 工作流（任务、journal、spec 等本地方法论文件，不公开）
-.trellis/
-.claude/
+# 本地安装产物（用户运行 npx skills add 后生成）
 .agents/
+.claude/
 .codex/
 
 # 编辑器

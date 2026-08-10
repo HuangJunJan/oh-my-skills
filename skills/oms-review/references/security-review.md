@@ -1,6 +1,6 @@
 # 安全审查清单 | Security Review
 
-`$oms-review` §3「安全」的展开。逐项排查注入、认证授权、敏感数据、常见漏洞;每条给 坏例/好例 对照。命中后按 §2 定级(注入/越权/密钥泄露通常是 Blocker,缺校验/弱配置通常是 Major)。具体修复纪律见 `$oms-be-coding`。
+`$oms-review` SKILL.md Common Tasks「安全审查」的展开。逐项排查注入、认证授权、敏感数据、常见漏洞;每条给 坏例/好例 对照。命中后按 `rules/risk-levels.md` 定级(注入/越权/密钥泄露通常是 Blocker,缺校验/弱配置通常是 Major)。具体修复纪律见 `$oms-be-coding`。
 
 > 示例语言只为说明问题形态,概念跨语言通用——审查时对照本语言的等价写法,不要因为示例不是当前语言就跳过。
 
@@ -95,7 +95,7 @@ r.GET("/orders/:id", requireAuth, func(c *gin.Context) {
 })
 ```
 
-审查要点:把 authz 判断散落在 handler 里、或只判 authn 不判 authz,都要标出;优先 middleware/guard/interceptor 分层(见 `$oms-be-coding` §1)。
+审查要点:把 authz 判断散落在 handler 里、或只判 authn 不判 authz,都要标出;优先 middleware/guard/interceptor 分层(见 `$oms-be-coding/rules/api-contract.md`)。
 
 ### 会话与 CSRF(Node / TS)
 
@@ -144,7 +144,7 @@ String hash = DigestUtils.md5Hex(password);
 String hash = new BCryptPasswordEncoder().encode(password);
 ```
 
-审查要点:敏感字段(token、身份证、手机号、银行卡)是否脱敏;传输是否强制 TLS;静态是否加密(见 `$oms-be-coding` §5)。
+审查要点:敏感字段(token、身份证、手机号、银行卡)是否脱敏;传输是否强制 TLS;静态是否加密(见 `$oms-be-coding/rules/security-config.md`)。
 
 ---
 
@@ -198,4 +198,4 @@ if (allowedOrigins.includes(req.headers.origin))
 - [ ] 口令是否用 bcrypt/argon2/scrypt;传输是否强制 TLS
 - [ ] 用户提供的 URL 是否防 SSRF;XML 是否关外部实体;CORS 是否白名单
 
-> 不能验证的项(缺乏运行环境、缺少调用链)按 `$oms-review` §5 说明剩余风险,不输出假确定结论。
+> 不能验证的项(缺乏运行环境、缺少调用链)按 `rules/output-format.md` §审查边界 说明剩余风险,不输出假确定结论。

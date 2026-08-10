@@ -1,77 +1,48 @@
 ---
 name: oms-meta
-description: 触发：每次对话 / 任何代码改动前 / 任何 oms-* skill 调用前。OhMySkills 最高优先级元规则：优先级、事实核验、工具能力、平台基线、证据完整性、skill 分层维护边界。
+primary: true
+description: >
+  任一 oms-* skill 生效时共同加载。触发于：代码/仓库检查、工具调用、时效事实核验、
+  验证交付、敏感操作、skill 维护。关键词：搜、查、跑、验证、部署、发布。
 ---
 
-# OhMySkills 元规则 | Meta Rules
+# OhMySkills 元规则
 
-本 skill 优先于其它 `oms-*` skill 加载。它只管跨任务、跨语言、跨平台的最高层规则；具体编码见 `$oms-coding`，对话见 `$oms-qa`，领域规则见对应领域 skill。
+本 skill 优先于其它 `oms-*`。它管跨任务、跨语言、跨平台的最高层规则。
 
-## 1. 优先级
+## Always Read
+1. `rules/priority.md` — 指令层级
+2. `rules/evidence-integrity.md` — 证据与验证完整性
 
-从高到低：
+## Session Discipline
+每个新任务——同一会话的第 N 轮——必须重读本 SKILL.md、重新匹配 Common Tasks、重读对应必读文件。
+检验：这次读的文件和 Common Tasks 里对应路由列的完全一致吗？
 
-```
-用户当次明确要求
-  > 更近层级项目规则（如 AGENTS.md）
-    > 本 oms-meta
-      > 其它 oms-* skills
-        > 工具默认行为
-```
+## Common Tasks
+| 任务 | 必读 | 流程 |
+|------|------|------|
+| 工具调用 / MCP / 浏览器 | `rules/tool-capability.md` | — |
+| 时效事实核验（"最新/查一下"） | `rules/fact-checking.md` | — |
+| 跨平台命令执行 | `rules/platform-baseline.md` | — |
+| Skill 维护（新增/修改/拆分） | `rules/skill-maintenance.md` | — |
+| 任何任务结束 | — | `workflows/task-closure.md` |
+| 多子任务（≥3 个独立子任务） | `rules/priority.md` + `rules/evidence-integrity.md` | `workflows/subagent-driven.md` |
+| 规则清退 / 废弃检测 | `rules/skill-maintenance.md` | `workflows/rule-deprecation.md` |
+| Other | `rules/priority.md` + `rules/evidence-integrity.md` | — |
 
-冲突时取更高层级；无法同时满足时，停止并说明冲突点。
+## Known Gotchas
+- 不把"没有报错"当成功 → `rules/evidence-integrity.md`
+- 不基于印象判断库/API 行为 → `rules/fact-checking.md`
+- 不同 shell 语法不互译（PowerShell ≠ bash）→ `rules/platform-baseline.md`
+- Skill 规则禁止复制到多份 → `rules/skill-maintenance.md`
 
-## 2. 事实核验
+## Red Flags — STOP
+- 发现自己在说"应该没问题"/"看起来能跑" → 停，读 `rules/evidence-integrity.md`
+- 工具不可用时手工模拟结果 → 停，读 `rules/tool-capability.md`
+- 用 bash 语法在 PowerShell 里硬跑（或反过来）→ 停，读 `rules/platform-baseline.md`
 
-- 未读过的代码、未查过的接口、未见过的库行为，一律标为未确认。
-- 能查本地文件、项目文档、测试、日志、MCP、官方文档或网页时，先查再回答。
-- 用户要求“最新 / 当前 / 今天 / 查一下”时必须检索。
-- 引用事实时给出文件路径、命令输出要点或 URL；不要用训练记忆假装确认。
-- 高风险假设不得静默落地：当继续推进依赖未经代码、接口、文档或用户确认的假设，且该假设影响正确性、数据一致性、权限、安全或用户操作结果时，先显式标出假设和影响，不把猜测直接当事实推进。
-
-## 3. 工具能力
-
-- 用户指定某工具 / MCP / 浏览器 / 外部系统时，先确认当前会话是否暴露该能力。
-- 不可用时中断并直接说明，不手工模拟、不假装执行、不降级成别的工具。
-- 需要越权、联网、安装依赖、破坏性操作或 GUI 操作时，按当前平台审批规则执行。
-- 使用并行工具或子代理时，只拆独立任务；不要把当前阻塞步骤外包。
-
-## 4. 平台基线
-
-进入项目先识别 OS、shell、工作目录、包管理器、脚本入口、编码和行尾约束。
-
-| 关键点 | PowerShell | cmd | POSIX shell | 统一要求 |
-|---|---|---|---|---|
-| 环境变量 | `$env:NAME` | `%NAME%` | `$NAME` | 按当前 shell 语法写，不互译。 |
-| 命令语法 | 对象管道、反引号转义 | 批处理变量和转义 | bash/sh 引号、通配符、重定向 | 引号、管道、通配符、重定向按当前 shell 处理。 |
-| 文本读写 | 显式 UTF-8 without BOM | 显式 UTF-8 without BOM | 显式 UTF-8 without BOM | 所有平台统一 UTF-8 without BOM，不依赖系统默认编码。 |
-| 路径与行尾 | 注意盘符、反斜杠、空格、CRLF | 注意盘符、反斜杠、空格、CRLF | 注意大小写、`/`、LF、可执行位 | 代码里用路径 API；遵循 `.gitattributes` 和仓库现状。 |
-| 工具与输出 | 以 lockfile、脚本、既有临时目录为准 | 同左 | 同左 | 不混用包管理器；临时文件不丢仓库根目录。 |
-
-平台不兼容导致命令失败时，先调整命令或工具调用方式，不把平台问题误判成代码缺陷。
-
-## 5. 证据完整性
-
-- 不能验证时说明阻塞原因、已做的替代检查和剩余风险。
-- 不把“没有报错”当作成功；成功必须对应明确标准。
-- 不隐藏失败、不吞错误、不写假成功报告。
-- 最终回复只报告真实完成的事。
-
-## 6. Skill 分层维护
-
-- 跨 skill 共用规则只保留在一个最合适的位置，其它 skill 用 `$oms-X` 引用。
-- Skill 内容保持精简；只写会改变 agent 行为的规则。
-- `description` 必须写清触发场景；正文只写触发后的执行规则。
-- 领域 skill 只写领域差异，不复制 `$oms-coding` 的通用纪律。
-- 修改 skill 时同步检查 README 技能表、示例触发、安装说明和相关 agent 元数据。
-
-## 反 anti-patterns
-
-- 避免：基于印象判断库/API 行为，不读代码或官方文档。
-- 避免：把影响正确性/数据/权限/安全的未确认假设当事实直接推进，不先显式说明假设和影响。
-- 避免：工具不可用时手工模拟结果。
-- 避免：同一条规则复制到多个 skill，后续维护漂移。
-- 避免：把触发条件只写在正文里，导致 agent 自动加载不到。
-- 避免：用 bash 写法在 PowerShell 里硬跑，或反过来把 PowerShell 写法当 POSIX shell。
-- 避免：读写文本文件依赖系统默认编码，或写出带 BOM 的 UTF-8。
-- 避免：小改动引入无关格式化、行尾、权限或目录噪音。
+## Core Principles
+- **宿主优先**：所有 skill 先遵循宿主 agent 的安全、权限、沙箱规则
+- **事实核验**：未读过的代码/未查过的接口/未见过的库行为 → 标为未确认
+- **证据完整**：最终回复只报告真实完成的事
+- **分层维护**：跨 skill 共用规则只保留在一个位置，其它用 `$oms-X` 引用
